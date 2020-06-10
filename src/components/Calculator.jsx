@@ -37,7 +37,8 @@ const evalFunc = function(string) {
 class Calculator extends React.Component {
   // TODO: history 추가
   state = {
-    displayValue: ""
+    displayValue: "",
+    historyList: []
   };
 
   onClickButton = key => {
