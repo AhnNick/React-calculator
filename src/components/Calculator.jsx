@@ -5,6 +5,7 @@ import Panel from "./Panel";
 import Display from "./Display";
 import ButtonGroup from "./ButtonGroup";
 import Button from "./Button";
+import History from "./History";
 
 const Container = styled.div`
   margin: 30px auto;
@@ -55,11 +56,31 @@ class Calculator extends React.Component {
         this.setState({ displayValue });
       },
       // TODO: 제곱근 구현
-      "√": () => {},
+      "√": () => {
+        if (lastChar !== "" && operatorKeys.includes(lastChar)) {
+          displayValue = displayValue.substr(0, displayValue.length - 1);
+        } else if (lastChar !== "") {
+          displayValue = evalFunc(displayValue);
+          displayValue = Math.sqrt(displayValue);
+        }
+        this.setState({ displayValue });
+      },
       // TODO: 사칙연산 구현
-      "÷": () => {},
-      "×": () => {},
-      "-": () => {},
+      "÷": () => {
+        if (lastChar !== "" && !operatorKeys.includes(lastChar)) {
+          this.setState({ displayValue: displayValue + "÷" });
+        }
+      },
+      "×": () => {
+        if (lastChar !== "" && !operatorKeys.includes(lastChar)) {
+          this.setState({ displayValue: displayValue + "×" });
+        }
+      },
+      "-": () => {
+        if (lastChar !== "" && !operatorKeys.includes(lastChar)) {
+          this.setState({ displayValue: displayValue + "-" });
+        }
+      },
       "+": () => {
         // + 연산 참고하여 연산 구현
         if (lastChar !== "" && !operatorKeys.includes(lastChar)) {
@@ -67,6 +88,8 @@ class Calculator extends React.Component {
         }
       },
       "=": () => {
+        displayValue = displayValue.replace("×","*");
+        displayValue = displayValue.replace("÷","/");
         if (lastChar !== "" && operatorKeys.includes(lastChar)) {
           displayValue = displayValue.substr(0, displayValue.length - 1);
         } else if (lastChar !== "") {
@@ -74,7 +97,12 @@ class Calculator extends React.Component {
         }
         this.setState({ displayValue });
       },
-      ".": () => {},
+      ".": () => {
+        if (Number(displayValue) !== 0) {
+          displayValue += ".";
+          this.setState({ displayValue });
+        }
+      },
       "0": () => {
         if (Number(displayValue) !== 0) {
           displayValue += "0";
@@ -97,11 +125,14 @@ class Calculator extends React.Component {
         <Panel>
           <Display displayValue={this.state.displayValue} />
           <ButtonGroup onClickButton={this.onClickButton}>
-            <Button size={2} color="gray">
+            <Button size={1} color="gray">
               AC
             </Button>
             <Button size={1} color="gray">
               BS
+            </Button>
+            <Button size={1} color="gray">
+              √
             </Button>
             <Button size={1} color="gray">
               ÷
@@ -136,7 +167,9 @@ class Calculator extends React.Component {
           </ButtonGroup>
         </Panel>
         {/* TODO: History componet를 이용해 map 함수와 Box styled div를 이용해 history 표시 */}
-
+        <History>
+          
+        </History>
       </Container>
     );
   }
