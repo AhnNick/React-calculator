@@ -36,6 +36,7 @@ const evalFunc = function(string) {
 
 class Calculator extends React.Component {
   // TODO: history 추가
+  historyCount = 0;
   state = {
     displayValue: "",
     historyList: []
@@ -43,6 +44,7 @@ class Calculator extends React.Component {
 
   onClickButton = key => {
     let { displayValue = "" } = this.state;
+    let { historyList = [] } = this.state;
     displayValue = "" + displayValue;
     const lastChar = displayValue.substr(displayValue.length - 1);
     const operatorKeys = ["÷", "×", "-", "+"];
@@ -58,13 +60,21 @@ class Calculator extends React.Component {
       },
       // TODO: 제곱근 구현
       "√": () => {
+        const beforeEval = "√(" + displayValue + ")";
+        displayValue = displayValue.replace("×","*");
+        displayValue = displayValue.replace("÷","/");
         if (lastChar !== "" && operatorKeys.includes(lastChar)) {
           displayValue = displayValue.substr(0, displayValue.length - 1);
         } else if (lastChar !== "") {
           displayValue = evalFunc(displayValue);
           displayValue = Math.sqrt(displayValue);
         }
+        const result = { before : beforeEval, after : displayValue}
+        let reverseList = this.state.historyList.reverse();
+        reverseList = reverseList.concat(result);
+        reverseList = reverseList.reverse()
         this.setState({ displayValue });
+        this.setState({ historyList : reverseList });
       },
       // TODO: 사칙연산 구현
       "÷": () => {
@@ -89,6 +99,7 @@ class Calculator extends React.Component {
         }
       },
       "=": () => {
+        const beforeEval = displayValue;
         displayValue = displayValue.replace("×","*");
         displayValue = displayValue.replace("÷","/");
         if (lastChar !== "" && operatorKeys.includes(lastChar)) {
@@ -96,7 +107,12 @@ class Calculator extends React.Component {
         } else if (lastChar !== "") {
           displayValue = evalFunc(displayValue);
         }
+        const result = { before : beforeEval, after : displayValue}
+        let reverseList = this.state.historyList.reverse();
+        reverseList = reverseList.concat(result);
+        reverseList = reverseList.reverse()
         this.setState({ displayValue });
+        this.setState({ historyList : reverseList });
       },
       ".": () => {
         if (Number(displayValue) !== 0) {
@@ -120,7 +136,12 @@ class Calculator extends React.Component {
     }
   };
 
+  onClickBox(data){
+    this.setState({ displayValue: data });
+  }
+
   render() {
+    const historyList = this.state.historyList;
     return (
       <Container>
         <Panel>
@@ -169,7 +190,15 @@ class Calculator extends React.Component {
         </Panel>
         {/* TODO: History componet를 이용해 map 함수와 Box styled div를 이용해 history 표시 */}
         <History>
-          
+          {
+            historyList.map((data, index) => (
+              <Box key={index}
+                onClick={() => {this.onClickBox(data.before);}}>
+                <h3>{data.before}</h3>
+                <h3>{data.after}</h3>
+              </Box>
+            ))
+          }
         </History>
       </Container>
     );
