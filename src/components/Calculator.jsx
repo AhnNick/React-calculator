@@ -29,10 +29,6 @@ const Box = styled.div`
   }
 `;
 
-// const evalFunc = function(string) {
-//   // eslint-disable-next-line no-new-func
-//   return new Function("return (" + string + ")")();
-// };
 const evalFunc = function(string) {
   let firstChar = string.substr(0,1);
   if(firstChar=="√") {
@@ -81,7 +77,7 @@ class Calculator extends React.Component {
           displayValue = evalFunc(displayValue);
           displayValue = Math.sqrt(displayValue);
         }
-        const result = { before : beforeEval, after : displayValue}
+        const result = { before : beforeEval, after : "= " + displayValue}
         let reverseList = this.state.historyList.reverse();
         reverseList = reverseList.concat(result);
         reverseList = reverseList.reverse()
@@ -105,7 +101,6 @@ class Calculator extends React.Component {
         }
       },
       "+": () => {
-        // + 연산 참고하여 연산 구현
         if (lastChar !== "" && !operatorKeys.includes(lastChar)) {
           this.setState({ displayValue: displayValue + "+" });
         }
@@ -119,7 +114,7 @@ class Calculator extends React.Component {
         } else if (lastChar !== "") {
           displayValue = evalFunc(displayValue);
         }
-        const result = { before : beforeEval, after : displayValue}
+        const result = { before : beforeEval, after : "= " + displayValue}
         let reverseList = this.state.historyList.reverse();
         reverseList = reverseList.concat(result);
         reverseList = reverseList.reverse()
@@ -127,10 +122,17 @@ class Calculator extends React.Component {
         this.setState({ historyList : reverseList });
       },
       ".": () => {
-        if (Number(displayValue) !== 0) {
-          displayValue += ".";
-          this.setState({ displayValue });
-        }
+        let displayTemp = (displayValue + ".");
+        let index = -1;
+        let count = 0;
+
+        do  {
+            index = displayTemp.indexOf('.', index + 1);
+            if (index != -1) { count++; }
+        } while (index != -1);
+
+        if(count > 1){ this.setState({ displayValue: displayValue}); }
+        else { this.setState({ displayValue: displayTemp}); }
       },
       "0": () => {
         if (Number(displayValue) !== 0) {
